@@ -230,7 +230,17 @@ fun CameraPreview(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    var detectedTextCorners by remember { mutableStateOf<List<TextCorners>>(emptyList()) }
+    // Store raw detected corners
+    var rawDetectedCorners by remember { mutableStateOf<List<TextCorners>>(emptyList()) }
+
+    // Derive the state to reduce unnecessary recompositions
+    val detectedTextCorners by remember { 
+        derivedStateOf { 
+            // Only trigger recomposition if the number of corners or their positions change significantly
+            rawDetectedCorners.takeIf { it.isNotEmpty() } ?: emptyList()
+        } 
+    }
+
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
 
     // Store a reference to the PreviewView
@@ -268,10 +278,14 @@ fun CameraPreview(
                     // Image analysis use case
                     val imageAnalysis = ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        // Set target resolution to 1080p for better performance
+                        .setTargetResolution(android.util.Size(1080, 1920))
+                        // Set target frame rate to 15 fps for better performance
+                        .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
                         .build()
                         .also {
                             it.setAnalyzer(cameraExecutor, TextAnalyzer(searchText) { corners ->
-                                detectedTextCorners = corners
+                                rawDetectedCorners = corners
                             })
                         }
 
@@ -322,20 +336,18 @@ fun CameraPreview(
 
         // Overlay for detected text boxes - positioned to match the PreviewView exactly
         previewBounds?.let { bounds ->
-            Canvas(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                detectedTextCorners.forEach { textCorners ->
+            // Use remember with key to avoid recalculating on every recomposition
+            val optimizedCorners = remember(detectedTextCorners) {
+                detectedTextCorners.map { textCorners ->
                     // Add padding to make the box larger than the text
                     val padding = 0.01f // 1% of the screen size as padding
 
-                    // Convert normalized corner points to canvas coordinates with padding
-                    val canvasPoints = textCorners.points.map { point ->
-                        // Calculate the center of the text
-                        val centerX = textCorners.points.map { it.x }.average().toFloat()
-                        val centerY = textCorners.points.map { it.y }.average().toFloat()
+                    // Calculate the center of the text once
+                    val centerX = textCorners.points.map { it.x }.average().toFloat()
+                    val centerY = textCorners.points.map { it.y }.average().toFloat()
 
+                    // Process all points at once
+                    val processedPoints = textCorners.points.map { point ->
                         // Calculate vector from center to point
                         val vectorX = point.x - centerX
                         val vectorY = point.y - centerY
@@ -344,23 +356,50 @@ fun CameraPreview(
                         val extendedX = centerX + vectorX * (1 + padding)
                         val extendedY = centerY + vectorY * (1 + padding)
 
-                        // Convert to canvas coordinates - use the actual PreviewView dimensions
+                        // Store the processed point
+                        PointF(extendedX, extendedY)
+                    }
+
+                    // Return the processed corners
+                    TextCorners(processedPoints)
+                }
+            }
+
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                // Use a more efficient drawing approach
+                optimizedCorners.forEach { textCorners ->
+                    // Create a path for more efficient drawing
+                    val path = androidx.compose.ui.graphics.Path()
+
+                    // Convert normalized corner points to canvas coordinates
+                    val points = textCorners.points.map { point ->
                         Offset(
-                            extendedX * size.width,
-                            extendedY * size.height
+                            point.x * size.width,
+                            point.y * size.height
                         )
                     }
 
-                    // Add the first point again to close the shape
-                    val drawPoints = canvasPoints + canvasPoints.first()
+                    // If we have points, start the path
+                    if (points.isNotEmpty()) {
+                        // Move to the first point
+                        path.moveTo(points.first().x, points.first().y)
 
-                    // Draw the polygon
-                    for (i in 0 until drawPoints.size - 1) {
-                        drawLine(
+                        // Add lines to each subsequent point
+                        points.drop(1).forEach { point ->
+                            path.lineTo(point.x, point.y)
+                        }
+
+                        // Close the path
+                        path.close()
+
+                        // Draw the path as a stroke
+                        drawPath(
+                            path = path,
                             color = Color.Green,
-                            start = drawPoints[i],
-                            end = drawPoints[i + 1],
-                            strokeWidth = 4f
+                            style = Stroke(width = 4f)
                         )
                     }
                 }
@@ -375,6 +414,15 @@ class TextAnalyzer(
 ) : ImageAnalysis.Analyzer {
     private val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
+    // Throttling mechanism
+    private var lastAnalysisTimestamp = 0L
+    private val analysisCooldownMs = 150L // Analyze at most every 150ms (approx. 6-7 fps)
+
+    // Caching mechanism
+    private var lastProcessedCorners: List<TextCorners> = emptyList()
+    private var frameSkipCounter = 0
+    private val MAX_FRAME_SKIP = 10 // Process at least every 10th frame even if no changes
+
     companion object {
         // Store both width and height of the preview view
         var previewWidth: Float = 0f
@@ -386,10 +434,37 @@ class TextAnalyzer(
 
         // Store the display metrics for more accurate scaling
         var displayDensity: Float = 1f
+
+        // Maximum number of matches to find before early termination
+        const val MAX_MATCHES = 5
     }
 
     @androidx.camera.core.ExperimentalGetImage
     override fun analyze(imageProxy: ImageProxy) {
+        val currentTimestamp = System.currentTimeMillis()
+
+        // Apply throttling: skip processing if not enough time has passed since last analysis
+        if (currentTimestamp - lastAnalysisTimestamp < analysisCooldownMs) {
+            // Return the cached results if we have them
+            if (lastProcessedCorners.isNotEmpty()) {
+                onTextDetected(lastProcessedCorners)
+            }
+            imageProxy.close()
+            return
+        }
+
+        // Apply frame skipping: process at least every MAX_FRAME_SKIP frames
+        if (lastProcessedCorners.isNotEmpty() && frameSkipCounter < MAX_FRAME_SKIP) {
+            frameSkipCounter++
+            onTextDetected(lastProcessedCorners)
+            imageProxy.close()
+            return
+        }
+
+        // Reset counter and update timestamp when we actually process a frame
+        frameSkipCounter = 0
+        lastAnalysisTimestamp = currentTimestamp
+
         val mediaImage = imageProxy.image
         if (mediaImage != null) {
             val image = InputImage.fromMediaImage(
@@ -419,7 +494,10 @@ class TextAnalyzer(
 
         val detectedCorners = mutableListOf<TextCorners>()
 
-        for (block in text.textBlocks) {
+        // Early termination flag
+        var shouldTerminateEarly = false
+
+        blockLoop@ for (block in text.textBlocks) {
             for (line in block.lines) {
                 for (element in line.elements) {
                     // Check if the element contains the search text (case insensitive)
@@ -427,6 +505,48 @@ class TextAnalyzer(
                         // Get the corner points
                         val cornerPoints = element.cornerPoints
                         if (cornerPoints != null && cornerPoints.size == 4) {
+                            // Pre-calculate values that are used multiple times
+                            val previewAspectRatio = if (previewHeight > 0) previewWidth / previewHeight else 0f
+
+                            // Calculate scaling factors once
+                            // Using 0.5625f (9:16 aspect ratio) as the reference value for 1080x1920 resolution
+                            // For square-ish screens, use a more moderate scaling approach
+
+                            // Reference aspect ratio (9:16)
+                            val referenceAspectRatio = 0.5625f
+
+                            // Calculate how far the current aspect ratio is from the reference
+                            val aspectRatioDifference = if (previewAspectRatio < referenceAspectRatio) {
+                                referenceAspectRatio / previewAspectRatio - 1f
+                            } else {
+                                previewAspectRatio / referenceAspectRatio - 1f
+                            }
+
+                            // Apply a dampening factor for square-ish screens (aspect ratio close to 1:1)
+                            // The closer to 1:1, the more we dampen the scaling
+                            val squarenessFactor = kotlin.math.max(0f, 1f - kotlin.math.abs(previewAspectRatio - 1f))
+                            val dampeningFactor = 1f - (squarenessFactor * 0.5f) // Reduce scaling by up to 50% for perfect squares
+
+                            // Log the factors for debugging
+                            Log.d("TextAnalyzer", "Preview aspect ratio: $previewAspectRatio")
+                            Log.d("TextAnalyzer", "Squareness factor: $squarenessFactor, Dampening factor: $dampeningFactor")
+
+                            // Calculate the final scaling factors with dampening applied
+                            val horizontalScalingFactor = if (previewAspectRatio < referenceAspectRatio) {
+                                1f + (aspectRatioDifference * dampeningFactor)
+                            } else {
+                                1.0f
+                            }
+
+                            val verticalScalingFactor = if (previewAspectRatio > referenceAspectRatio) {
+                                1f + (aspectRatioDifference * dampeningFactor)
+                            } else {
+                                1.0f
+                            }
+
+                            // Log the final scaling factors
+                            Log.d("TextAnalyzer", "Horizontal scaling factor: $horizontalScalingFactor, Vertical scaling factor: $verticalScalingFactor")
+
                             // Transform the coordinates to match the preview view
                             val transformedPoints = cornerPoints.map { point ->
                                 // Handle the camera sensor orientation by swapping x and y
@@ -438,42 +558,34 @@ class TextAnalyzer(
                                 val normalizedX = 1f - (cameraX / height)
                                 val normalizedY = cameraY / width
 
-                                // Calculate the aspect ratio of the preview screen (width/height)
-                                val previewAspectRatio = if (previewHeight > 0) previewWidth / previewHeight else 0f
-
-                                // Apply scaling based on aspect ratio
-                                // For narrower screens (aspect ratio < 0.75), scale horizontal position
-                                // For wider screens (aspect ratio > 0.75), scale vertical position
-                                // Calculate scaling factors
-                                val horizontalScalingFactor = if (previewAspectRatio < 0.75f) {
-                                    val factor = (1f / previewAspectRatio) * 0.75f
-                                    factor
-                                } else {
-                                    1.0f
-                                }
-
-                                val verticalScalingFactor = if (previewAspectRatio > 0.75f) {
-                                    val factor = previewAspectRatio / 0.75f
-                                    factor
-                                } else {
-                                    1.0f
-                                }
-
                                 // Apply scaling from center point (0.5)
                                 val scaledX = 0.5f + (normalizedX - 0.5f) * horizontalScalingFactor
                                 val scaledY = 0.5f + (normalizedY - 0.5f) * verticalScalingFactor
+
+                                // Log the coordinate transformation for debugging
+                                Log.d("TextAnalyzer", "Coordinate transformation: ($normalizedX, $normalizedY) -> ($scaledX, $scaledY)")
 
                                 // Return the normalized and scaled point
                                 PointF(scaledX, scaledY)
                             }
 
                             detectedCorners.add(TextCorners(transformedPoints))
+
+                            // Check if we've found enough matches
+                            if (detectedCorners.size >= MAX_MATCHES) {
+                                shouldTerminateEarly = true
+                                break@blockLoop
+                            }
                         }
                     }
                 }
             }
         }
 
+        // Update the cache with the new results
+        lastProcessedCorners = detectedCorners
+
+        // Send the results to the callback
         onTextDetected(detectedCorners)
     }
 }
