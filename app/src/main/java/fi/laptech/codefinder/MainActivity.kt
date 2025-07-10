@@ -410,8 +410,8 @@ fun CameraPreview(
                         // Draw the path as a stroke
                         drawPath(
                             path = path,
-                            color = Color.Green,
-                            style = Stroke(width = 4f)
+                            color = Color.Red,
+                            style = Stroke(width = 10f)
                         )
                     }
                 }
