@@ -213,13 +213,14 @@ fun CameraScreen(
         // Overlay showing the search text
         Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter),
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                .align(Alignment.TopCenter)
+                .padding(16.dp),
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+            shape = MaterialTheme.shapes.extraLarge
         ) {
             Text(
                 text = stringResource(R.string.searching_for, searchText),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
