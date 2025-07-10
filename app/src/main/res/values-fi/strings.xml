@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">IDFinder</string>
+    <string name="enter_text_to_find">Syötä etsittävä teksti</string>
+    <string name="search_button">Etsi</string>
+    <string name="searching_for">Etsitään: %1$s</string>
+    <string name="camera_permission_required">Kameran käyttöoikeus vaaditaan tätä toimintoa varten</string>
+    <string name="grant_permission">Myönnä käyttöoikeus</string>
+</resources>
