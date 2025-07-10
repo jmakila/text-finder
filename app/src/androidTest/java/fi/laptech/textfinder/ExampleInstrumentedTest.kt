@@ -1,4 +1,4 @@
-package fi.laptech.codefinder
+package fi.laptech.textfinder
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("fi.laptech.codefinder", appContext.packageName)
+        assertEquals("fi.laptech.textfinder", appContext.packageName)
     }
 }

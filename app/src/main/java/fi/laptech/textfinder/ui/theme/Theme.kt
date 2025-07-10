@@ -1,4 +1,4 @@
-package fi.laptech.codefinder.ui.theme
+package fi.laptech.textfinder.ui.theme
 
 import android.app.Activity
 import android.os.Build

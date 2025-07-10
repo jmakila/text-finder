@@ -1,4 +1,4 @@
-package fi.laptech.codefinder
+package fi.laptech.textfinder
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -52,7 +52,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import fi.laptech.codefinder.ui.theme.IDFinderTheme
+import fi.laptech.textfinder.ui.theme.IDFinderTheme
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.roundToInt

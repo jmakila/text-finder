@@ -1,4 +1,4 @@
-package fi.laptech.codefinder
+package fi.laptech.textfinder
 
 import org.junit.Test
 import org.junit.Assert.*

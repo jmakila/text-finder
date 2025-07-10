@@ -1,4 +1,4 @@
-package fi.laptech.codefinder.ui.theme
+package fi.laptech.textfinder.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

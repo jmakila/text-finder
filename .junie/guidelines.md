@@ -47,7 +47,7 @@ Run all unit tests:
 
 Run a specific test class:
 ```
-./gradlew testDebugUnitTest --tests "fi.laptech.codefinder.SimpleUtilTest"
+./gradlew testDebugUnitTest --tests "textfinder.SimpleUtilTest"
 ```
 
 #### Instrumented Tests
@@ -65,17 +65,18 @@ Run all instrumented tests (requires a connected device or emulator):
 4. Use JUnit assertions to verify expected behavior
 
 Example:
+
 ```kotlin
-package fi.laptech.codefinder
+package textfinder
 
 import org.junit.Test
 import org.junit.Assert.*
 
 class UtilityTest {
-    @Test
-    fun testSomeFunction() {
-        assertEquals(expected, actual)
-    }
+   @Test
+   fun testSomeFunction() {
+      assertEquals(expected, actual)
+   }
 }
 ```
 
@@ -86,8 +87,9 @@ class UtilityTest {
 4. For Compose UI testing, use `ComposeTestRule`
 
 Example:
+
 ```kotlin
-package fi.laptech.codefinder
+package textfinder
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -97,11 +99,11 @@ import org.junit.Assert.*
 
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
-    @Test
-    fun useAppContext() {
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("fi.laptech.codefinder", appContext.packageName)
-    }
+   @Test
+   fun useAppContext() {
+      val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+      assertEquals("textfinder", appContext.packageName)
+   }
 }
 ```
 

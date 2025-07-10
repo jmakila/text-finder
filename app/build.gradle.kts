@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "fi.laptech.codefinder"
+    namespace = "fi.laptech.textfinder"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "fi.laptech.codefinder"
+        applicationId = "fi.laptech.textfinder"
         minSdk = 31
         targetSdk = 36
         versionCode = 1

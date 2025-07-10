@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IDFinder</string>
+    <string name="app_name">Text Finder</string>
     <string name="enter_text_to_find">Enter text to find</string>
     <string name="search_button">Search</string>
     <string name="searching_for">Searching for: %1$s</string>
