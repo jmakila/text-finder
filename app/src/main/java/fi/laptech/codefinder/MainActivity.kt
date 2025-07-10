@@ -279,7 +279,7 @@ fun CameraPreview(
                     val imageAnalysis = ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         // Set target resolution to 1080p for better performance
-                        .setTargetResolution(android.util.Size(1080, 1920))
+                        .setTargetResolution(android.util.Size(1440, 1920))
                         // Set target frame rate to 15 fps for better performance
                         .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
                         .build()
@@ -436,7 +436,7 @@ class TextAnalyzer(
         var displayDensity: Float = 1f
 
         // Maximum number of matches to find before early termination
-        const val MAX_MATCHES = 5
+        const val MAX_MATCHES = 1
     }
 
     @androidx.camera.core.ExperimentalGetImage
@@ -508,12 +508,8 @@ class TextAnalyzer(
                             // Pre-calculate values that are used multiple times
                             val previewAspectRatio = if (previewHeight > 0) previewWidth / previewHeight else 0f
 
-                            // Calculate scaling factors once
-                            // Using 0.5625f (9:16 aspect ratio) as the reference value for 1080x1920 resolution
-                            // For square-ish screens, use a more moderate scaling approach
-
-                            // Reference aspect ratio (9:16)
-                            val referenceAspectRatio = 0.5625f
+                            // Reference aspect ratio (3:4)
+                            val referenceAspectRatio = 0.75f
 
                             // Calculate how far the current aspect ratio is from the reference
                             val aspectRatioDifference = if (previewAspectRatio < referenceAspectRatio) {
@@ -522,24 +518,18 @@ class TextAnalyzer(
                                 previewAspectRatio / referenceAspectRatio - 1f
                             }
 
-                            // Apply a dampening factor for square-ish screens (aspect ratio close to 1:1)
-                            // The closer to 1:1, the more we dampen the scaling
-                            val squarenessFactor = kotlin.math.max(0f, 1f - kotlin.math.abs(previewAspectRatio - 1f))
-                            val dampeningFactor = 1f - (squarenessFactor * 0.5f) // Reduce scaling by up to 50% for perfect squares
-
                             // Log the factors for debugging
                             Log.d("TextAnalyzer", "Preview aspect ratio: $previewAspectRatio")
-                            Log.d("TextAnalyzer", "Squareness factor: $squarenessFactor, Dampening factor: $dampeningFactor")
 
                             // Calculate the final scaling factors with dampening applied
                             val horizontalScalingFactor = if (previewAspectRatio < referenceAspectRatio) {
-                                1f + (aspectRatioDifference * dampeningFactor)
+                                1f + aspectRatioDifference
                             } else {
                                 1.0f
                             }
 
                             val verticalScalingFactor = if (previewAspectRatio > referenceAspectRatio) {
-                                1f + (aspectRatioDifference * dampeningFactor)
+                                1f + aspectRatioDifference
                             } else {
                                 1.0f
                             }
