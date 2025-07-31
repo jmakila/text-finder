@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.graphics.RectF
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -393,7 +392,7 @@ fun CameraPreview(
                         )
 
                     } catch (e: Exception) {
-                        Log.e("CameraPreview", "Use case binding failed", e)
+                        // Camera binding failed
                     }
                 }, ContextCompat.getMainExecutor(ctx))
 
@@ -568,7 +567,7 @@ class TextAnalyzer(
                     processTextRecognitionResult(visionText, imageProxy.width, imageProxy.height)
                 }
                 .addOnFailureListener { e ->
-                    Log.e("TextAnalyzer", "Text recognition failed", e)
+                    // Text recognition failed
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
@@ -609,8 +608,6 @@ class TextAnalyzer(
                                 previewAspectRatio / referenceAspectRatio - 1f
                             }
 
-                            // Log the factors for debugging
-                            Log.d("TextAnalyzer", "Preview aspect ratio: $previewAspectRatio")
 
                             // Calculate the final scaling factors with dampening applied
                             val horizontalScalingFactor = if (previewAspectRatio < referenceAspectRatio) {
@@ -625,8 +622,6 @@ class TextAnalyzer(
                                 1.0f
                             }
 
-                            // Log the final scaling factors
-                            Log.d("TextAnalyzer", "Horizontal scaling factor: $horizontalScalingFactor, Vertical scaling factor: $verticalScalingFactor")
 
                             // Transform the coordinates to match the preview view
                             val transformedPoints = cornerPoints.map { point ->
@@ -643,8 +638,6 @@ class TextAnalyzer(
                                 val scaledX = 0.5f + (normalizedX - 0.5f) * horizontalScalingFactor
                                 val scaledY = 0.5f + (normalizedY - 0.5f) * verticalScalingFactor
 
-                                // Log the coordinate transformation for debugging
-                                Log.d("TextAnalyzer", "Coordinate transformation: ($normalizedX, $normalizedY) -> ($scaledX, $scaledY)")
 
                                 // Return the normalized and scaled point
                                 PointF(scaledX, scaledY)
