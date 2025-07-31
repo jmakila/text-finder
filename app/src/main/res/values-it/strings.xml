@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Cerca Testo</string>
+    <string name="enter_text_to_find">Inserisci il testo da cercare</string>
+    <string name="search_button">Cerca</string>
+    <string name="searching_for">Ricerca di: %1$s</string>
+    <string name="camera_permission_required">È richiesta l\'autorizzazione della fotocamera per questa funzione</string>
+    <string name="grant_permission">Concedi Autorizzazione</string>
+    <string name="app_help_title">Come usare Cerca Testo</string>
+    <string name="app_help_description">Cerca Testo ti aiuta a localizzare testo nel mondo reale usando la tua fotocamera.\n\n1. Inserisci il testo che vuoi trovare nel campo di ricerca\n2. Tocca il pulsante Cerca\n3. Punta la fotocamera verso documenti, cartelli o qualsiasi testo\n4. Quando l\'app trova il tuo testo, lo evidenzierà con un riquadro rosso</string>
+    <string name="close">Chiudi</string>
+</resources>

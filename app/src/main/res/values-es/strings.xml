@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Buscador de Texto</string>
+    <string name="enter_text_to_find">Ingrese texto a buscar</string>
+    <string name="search_button">Buscar</string>
+    <string name="searching_for">Buscando: %1$s</string>
+    <string name="camera_permission_required">Se requiere permiso de cámara para esta función</string>
+    <string name="grant_permission">Conceder Permiso</string>
+    <string name="app_help_title">Cómo usar Buscador de Texto</string>
+    <string name="app_help_description">Buscador de Texto te ayuda a localizar texto en el mundo real usando tu cámara.\n\n1. Ingresa el texto que quieres encontrar en el campo de búsqueda\n2. Toca el botón Buscar\n3. Apunta tu cámara a documentos, letreros o cualquier texto\n4. Cuando la aplicación encuentre tu texto, lo resaltará con un cuadro rojo</string>
+    <string name="close">Cerrar</string>
+</resources>

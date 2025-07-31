@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Chercheur de Texte</string>
+    <string name="enter_text_to_find">Entrez le texte à chercher</string>
+    <string name="search_button">Rechercher</string>
+    <string name="searching_for">Recherche de : %1$s</string>
+    <string name="camera_permission_required">L\'autorisation de la caméra est requise pour cette fonctionnalité</string>
+    <string name="grant_permission">Accorder l\'autorisation</string>
+    <string name="app_help_title">Comment utiliser Chercheur de Texte</string>
+    <string name="app_help_description">Chercheur de Texte vous aide à localiser du texte dans le monde réel à l\'aide de votre caméra.\n\n1. Entrez le texte que vous souhaitez trouver dans le champ de recherche\n2. Appuyez sur le bouton Rechercher\n3. Pointez votre caméra vers des documents, des panneaux ou tout texte\n4. Lorsque l\'application trouve votre texte, elle le mettra en évidence avec un cadre rouge</string>
+    <string name="close">Fermer</string>
+</resources>

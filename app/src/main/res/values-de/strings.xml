@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Textfinder</string>
+    <string name="enter_text_to_find">Text zum Suchen eingeben</string>
+    <string name="search_button">Suchen</string>
+    <string name="searching_for">Suche nach: %1$s</string>
+    <string name="camera_permission_required">Kameraberechtigung ist für diese Funktion erforderlich</string>
+    <string name="grant_permission">Berechtigung erteilen</string>
+    <string name="app_help_title">Wie man Textfinder benutzt</string>
+    <string name="app_help_description">Textfinder hilft Ihnen, Text in der realen Welt mit Ihrer Kamera zu finden.\n\n1. Geben Sie den Text, den Sie finden möchten, in das Suchfeld ein\n2. Tippen Sie auf die Schaltfläche \"Suchen\"\n3. Richten Sie Ihre Kamera auf Dokumente, Schilder oder beliebigen Text\n4. Wenn die App Ihren Text findet, wird er mit einem roten Rahmen hervorgehoben</string>
+    <string name="close">Schließen</string>
+</resources>
