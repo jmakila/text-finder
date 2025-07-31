@@ -1,4 +1,4 @@
-package fi.laptech.textfinder
+package fi.plague.textfinder
 
 import org.junit.Test
 import org.junit.Assert.*

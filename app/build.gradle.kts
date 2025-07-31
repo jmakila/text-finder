@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "fi.laptech.textfinder"
+    namespace = "fi.plague.textfinder"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "fi.laptech.textfinder"
+        applicationId = "fi.plague.textfinder"
         minSdk = 31
         targetSdk = 36
         versionCode = 1

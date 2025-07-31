@@ -1,4 +1,4 @@
-package fi.laptech.textfinder.ui.theme
+package fi.plague.textfinder.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
