@@ -5,4 +5,7 @@
     <string name="searching_for">Etsitään: %1$s</string>
     <string name="camera_permission_required">Kameran käyttöoikeus vaaditaan tätä toimintoa varten</string>
     <string name="grant_permission">Myönnä käyttöoikeus</string>
+    <string name="app_help_title">Kuinka käyttää Tekstin Etsijää</string>
+    <string name="app_help_description">Tekstin Etsijä auttaa sinua löytämään tekstiä ympäristöstäsi kameran avulla.\n\n1. Syötä etsittävä teksti hakukenttään\n2. Napauta Etsi-painiketta\n3. Suuntaa kamera dokumentteihin, kyltteihin tai mihin tahansa tekstiin\n4. Kun sovellus löytää tekstisi, se korostaa sen punaisella laatikolla</string>
+    <string name="close">Sulje</string>
 </resources>

@@ -5,4 +5,7 @@
     <string name="searching_for">Searching for: %1$s</string>
     <string name="camera_permission_required">Camera permission is required for this feature</string>
     <string name="grant_permission">Grant Permission</string>
+    <string name="app_help_title">How to use Text Finder</string>
+    <string name="app_help_description">Text Finder helps you locate text in the real world using your camera.\n\n1. Enter the text you want to find in the search field\n2. Tap the Search button\n3. Point your camera at documents, signs, or any text\n4. When the app finds your text, it will highlight it with a red box</string>
+    <string name="close">Close</string>
 </resources>
